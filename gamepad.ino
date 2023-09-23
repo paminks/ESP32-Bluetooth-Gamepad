@@ -1,14 +1,3 @@
-/*
- * ANDROID GAMEPAD
- * {A=1, B=2, C=3, X=4, Y=5, Z=6, L1=7, R1=8, L2=9, R2=10,
- * Select=11, Start=12, PS=13, L3=14 , R3=15} 
- * 
- * PS GAMEPAD MODE
- * {SQUARE=1, X=2, CIRCLE=3, TRIANGLE=4, L1=5, R1=6, L2=7, R2=8,
- * Select=9, Start=10, L3=11, R3=12, PS=13}
- * 
- */
-
 #include <Arduino.h>
 #include <BleGamepad.h>
 
@@ -19,6 +8,7 @@
 #define TRIANGLE_BUTTON 21  // Y
 #define SQUARE_BUTTON 22   // X
 
+//change every 0 to your desired pin
 //TRIGGERS
 #define R1_BUTTON 0
 #define R2_BUTTON 18
@@ -42,7 +32,7 @@
 
 #define NUM_BUTTONS 13
 
-//The order of these three arrays matters a lot, be carefully when changing them
+//The order of these three arrays matters a lot, be carefully when changing them. You dont even need to change them
 int buttonsPins[NUM_BUTTONS] = {X_BUTTON, CIRCLE_BUTTON, TRIANGLE_BUTTON, SQUARE_BUTTON,
                           R1_BUTTON, R2_BUTTON, L1_BUTTON, L2_BUTTON,
                           START_BUTTON, SELECT_BUTTON, PS_BUTTON,
@@ -53,6 +43,8 @@ int androidGamepadButtons[NUM_BUTTONS] = {1, 2, 3, 4, 8, 10, 7, 9, 12, 11, 13, 1
 int PS1GamepadButtons[NUM_BUTTONS] = {2, 3, 4, 1, 6, 8, 5, 7, 10, 9, 13, 12, 11};
 int PCGamepadButtons[NUM_BUTTONS] = {1, 2, 4, 3, 6, 8, 5, 7, 10, 9, 0, 12, 11};
 
+
+//integer values for the Axis
 
 uint16_t leftVrxJoystickLecture = 0;
 uint16_t leftVryJoystickLecture = 0;
@@ -65,10 +57,10 @@ uint16_t rightVrxJoystickValue = 0;
 uint16_t rightVryJoystickValue = 0;
 
 
-
+//chanege gamepadMode to your desired platform
 typedef enum{ANDROID, PS1, PC} GamepadModes;
 GamepadModes gamepadMode = PC;
-
+                //change   /|\ this
 
 BleGamepad bleGamepad("Paminks --gamepad", "Maker101 Home");
 BleGamepadConfiguration bleGamepadConfig;  
@@ -82,7 +74,7 @@ void setup() {
   for(int i=0; i<NUM_BUTTONS; i++){
     pinMode(buttonsPins[i], INPUT_PULLUP);
   }
-
+//initializes basics of the BLE GAMEPAD library
   bleGamepadConfig.setAutoReport(false);
   bleGamepadConfig.setControllerType(CONTROLLER_TYPE_GAMEPAD); // CONTROLLER_TYPE_JOYSTICK, CONTROLLER_TYPE_GAMEPAD (DEFAULT), CONTROLLER_TYPE_MULTI_AXIS
   bleGamepadConfig.setVid(0xe502);
@@ -93,12 +85,14 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
+  //reads analog values of the joysticks 
   if(bleGamepad.isConnected()){
     //Joysticks lecture
     leftVrxJoystickLecture = analogRead(LEFT_VRX_JOYSTICK);
     leftVryJoystickLecture = analogRead(LEFT_VRY_JOYSTICK);
     rightVrxJoystickLecture = analogRead(RIGHT_VRX_JOYSTICK);
     rightVryJoystickLecture = analogRead(RIGHT_VRY_JOYSTICK);
+    //serial.print's are for debugging you can remove them if you want to
     Serial.print("\n");
     Serial.print(leftVrxJoystickLecture);
     Serial.print("\n");
@@ -114,7 +108,7 @@ void loop() {
     rightVrxJoystickValue = map(rightVrxJoystickLecture, 4095, 0, 0, 32737);
     rightVryJoystickValue = map(rightVryJoystickLecture, 0, 4095, 0, 32737);
 
-    
+    //do not touch this code it already works no need to change
     switch(gamepadMode){
       case ANDROID:
         for(int i=0; i<NUM_BUTTONS; i++){
@@ -168,3 +162,4 @@ void joysticksHandlerForPC(uint16_t leftVrx, uint16_t leftVry, uint16_t rightVrx
   bleGamepad.setZ(rightVrxJoystickValue);
   bleGamepad.setRX(rightVryJoystickValue);
 }
+//this code is inspired by Maker 101 yotube channel, but they didn't documented the code very well, I'm doing it for them 
